@@ -264,11 +264,18 @@ class RPMDBPackageSack(PackageSackBase):
 
     pkglist = property(_get_pkglist, None)
 
+    def _closeRpmDBTransaction(self):
+        """ Close the cached transaction so private DB views are refreshed. """
+        if self.ts is not None:
+            self.ts.close()
+            self.ts = None
+
     def dropCachedData(self):
         """ Drop all cached data, this is a big perf. hit if we need to load
             the data back in again. Also note that if we ever call this while
             a transaction is ongoing we'll have multiple copies of packages
             which is _bad_. """
+        self._closeRpmDBTransaction()
         self._idx2pkg = {}
         self._name2pkg = {}
         self._pkgnames_loaded = set()
@@ -300,6 +307,7 @@ class RPMDBPackageSack(PackageSackBase):
             this tries to keep as much data as possible and even does a
             "preload" on the checksums. This should be called once, when a
             transaction is complete. """
+        self._closeRpmDBTransaction()
         # -- Below -- self._idx2pkg = {}
         # -- Below -- self._name2pkg = {}
         # -- Below -- self._pkgnames_loaded = set()
@@ -1857,4 +1865,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

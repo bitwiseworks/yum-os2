@@ -557,7 +557,6 @@ class YumBase(depsolve.Depsolve):
     def closeRpmDB(self):
         """closes down the instances of the rpmdb we have wangling around"""
         if self._rpmdb is not None:
-            self._rpmdb.ts = None
             self._rpmdb.dropCachedData()
         self._rpmdb = None
         self._ts = None
