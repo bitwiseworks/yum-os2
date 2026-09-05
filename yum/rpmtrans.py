@@ -226,10 +226,22 @@ class RPMTransaction:
         # reset rpm bits from reording output
         rpm.setVerbosity(rpm.RPMLOG_NOTICE)
         rpm.setLogFile(sys.stderr)
+        self.base.ts.setScriptFd(sys.stderr)
         try:
             self._writepipe.close()
         except:
             pass
+        try:
+            self._readpipe.close()
+        except:
+            pass
+        if os.name == 'os2':
+            # NamedTemporaryFile fails to delete the underlying file on
+            # destruction in Python 2 on OS/2, do it manually
+            try:
+                os.remove(self._readpipe.name)
+            except:
+                pass
 
     def _scriptOutput(self):
         try:
