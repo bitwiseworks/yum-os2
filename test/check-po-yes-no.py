@@ -1,4 +1,4 @@
-#! /usr/bin/python -tt
+#! /usr/bin/python2 -tt
 
 # This is a simple command to check that "Is this ok [y/N]: " and yes and no
 # have either all been translated or none have been translated.

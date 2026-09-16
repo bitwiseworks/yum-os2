@@ -1,4 +1,4 @@
-#! /usr/bin/python -tt
+#! /usr/bin/python2 -tt
 """
 Assorted utility functions for yum.
 """

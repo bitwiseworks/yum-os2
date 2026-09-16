@@ -1,4 +1,4 @@
-#!/usr/bin/python -t
+#!/usr/bin/python2 -t
 
 """This handles actual output from the cli"""
 

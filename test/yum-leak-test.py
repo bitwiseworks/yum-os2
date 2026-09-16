@@ -1,4 +1,4 @@
-#! /usr/bin/python -tt
+#! /usr/bin/python2 -tt
 
 # Do either:
 # ./yum-leak-test.py
