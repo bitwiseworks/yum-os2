@@ -1,5 +1,7 @@
 #!/usr/bin/python -tt
 
+from rpmUtils import paths
+
 import rpm
 import types
 import os
@@ -286,10 +288,10 @@ class Rpm_Ts_Work:
     """This should operate on groups of headers/matches/etc in the rpmdb - ideally it will 
     operate with a list of the Base objects above, so I can refer to any one object there
     not sure the best way to do this yet, more thinking involved"""
-    def __init__(self, dbPath='/'):
+    def __init__(self, dbPath=paths.ROOTPREFIX):
         try:
             if conf.installroot:
-                if conf.installroot != '/':
+                if conf.installroot != paths.ROOTPREFIX:
                     dbPath = conf.installroot
         except NameError, e:
             pass

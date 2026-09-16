@@ -5,3 +5,16 @@ run make install, if you're a masochist.
 
 you're better off making an rpm and installing it
 
+Runtime directories are generated in rpmUtils/paths.py by Config.mak using sed.
+The current directory variables are recorded in paths.vars; make rewrites the
+module when those values change. The defaults are ROOTPREFIX=/, PREFIX=/usr,
+SYSCONFDIR=/etc and LOCALSTATEDIR=/var. Override these on the make command line
+for the target layout, for example:
+
+make PYTHON=python2.7.exe ROOTPREFIX=/@unixroot PREFIX=/@unixroot/usr \
+     SYSCONFDIR=/@unixroot/etc LOCALSTATEDIR=/@unixroot/var
+
+Pass the same values to make install. DESTDIR is only a staging directory and is
+never included in the generated module. Changing directory values causes the
+module to be regenerated; make clean removes it. For source-tree use, make paths
+generates just this module without building translations.

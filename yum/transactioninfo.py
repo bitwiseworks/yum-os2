@@ -26,6 +26,8 @@ Classes and functions for manipulating a transaction to be passed
 to rpm.
 """
 
+from rpmUtils import paths
+
 from constants import *
 from packageSack import PackageSack, PackageSackVersion
 from packages import YumInstalledPackage
@@ -76,7 +78,7 @@ class TransactionData:
         self.flags = []
         self.vsflags = []
         self.probFilterFlags = []
-        self.root = '/'
+        self.root = paths.ROOTPREFIX
         self.pkgdict = {} # key = pkgtup, val = list of TransactionMember obj
         self._namedict = {} # name -> list of TransactionMember obj
         self._unresolvedMembers = set()

@@ -1,4 +1,6 @@
 #!/usr/bin/python
+from rpmUtils import paths
+
 import sys, os
 import optparse
 
@@ -16,7 +18,7 @@ if not options.nofork:
     os.dup2(fd, 2)
     os.close(fd)
 
-sys.path.insert(0, '/usr/share/yum-cli')
+sys.path.insert(0, paths.PREFIX + '/share/yum-cli')
 try:
     import yumupd
     yumupd.main(options)

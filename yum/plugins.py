@@ -14,6 +14,8 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # Copyright 2005 Duke University
 
+from rpmUtils import paths
+
 import os
 import glob
 import imp
@@ -136,7 +138,7 @@ class YumPlugins:
             files. Defaults to "/etc/yum/pluginconf.d".
         '''
         if not pluginconfpath:
-            pluginconfpath = ['/@unixroot/etc/yum/pluginconf.d']
+            pluginconfpath = [paths.SYSCONFDIR + '/yum/pluginconf.d']
 
         self.searchpath = searchpath
         self.pluginconfpath = pluginconfpath

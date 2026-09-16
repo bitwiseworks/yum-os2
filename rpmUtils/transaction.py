@@ -11,6 +11,8 @@
 #    can share transactions instead of creating new ones all over
 #
 
+from rpmUtils import paths
+
 import rpm
 import miscutils
 
@@ -20,7 +22,7 @@ ts = None
 # wrapper/proxy class for rpm.Transaction so we can
 # instrument it, etc easily
 class TransactionWrapper:
-    def __init__(self, root='/'):
+    def __init__(self, root=paths.ROOTPREFIX):
         self.ts = rpm.TransactionSet(root)
         self._methods = ['check',
                          'order',
@@ -186,7 +188,7 @@ class TransactionWrapper:
         return orphan
 
         
-def initReadOnlyTransaction(root='/'):
+def initReadOnlyTransaction(root=paths.ROOTPREFIX):
     read_ts =  TransactionWrapper(root=root)
     read_ts.pushVSFlags((rpm._RPMVSF_NOSIGNATURES|rpm._RPMVSF_NODIGESTS))
     return read_ts

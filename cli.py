@@ -19,6 +19,8 @@
 Command line interface yum class and related.
 """
 
+from rpmUtils import paths
+
 import os
 import re
 import sys
@@ -266,7 +268,7 @@ class YumBaseCli(yum.YumBase, output.YumOutput):
             self.logger.warning("Ignored option -q, -v, -d or -e (probably due to merging: -yq != -y -q)")
         #  getRoot() changes it, but then setupYumConfig() changes it back. So
         # don't test for this, if we are using --installroot.
-        if root == '/' and opts.conffile != pc.fn:
+        if root == paths.ROOTPREFIX and opts.conffile != pc.fn:
             self.logger.warning("Ignored option -c (probably due to merging -yc != -y -c)")
 
         if opts.version:
@@ -1644,15 +1646,17 @@ class YumOptionParser(OptionParser):
         # If the conf file is inside the  installroot - use that.
         # otherwise look for it in the normal root
         if opts.installroot:
-            if os.access(opts.installroot+'/'+opts.conffile, os.R_OK):
-                opts.conffile = opts.installroot+'/'+opts.conffile
-            elif opts.conffile == '/etc/yum/yum.conf':
+            conffile = paths.rooted(opts.installroot, opts.conffile)
+            if os.access(conffile, os.R_OK):
+                opts.conffile = conffile
+            elif opts.conffile == paths.SYSCONFDIR + '/yum/yum.conf':
                 # check if /installroot/etc/yum.conf exists.
-                if os.access(opts.installroot+'/etc/yum.conf', os.R_OK):
-                    opts.conffile = opts.installroot+'/etc/yum.conf'         
+                old_conffile = paths.rooted(opts.installroot, paths.SYSCONFDIR + '/yum.conf')
+                if os.access(old_conffile, os.R_OK):
+                    opts.conffile = old_conffile
             root=opts.installroot
         else:
-            root = '/@unixroot'
+            root = paths.ROOTPREFIX
         return root
 
     def _wrapOptParseUsage(self, opt, value, parser, *args, **kwargs):
@@ -1690,7 +1694,7 @@ class YumOptionParser(OptionParser):
                 action="store_true",
                 help=_("run entirely from system cache, don't update cache"))
         group.add_option("-c", "--config", dest="conffile",
-                default='/@unixroot/etc/yum/yum.conf',
+                default=paths.SYSCONFDIR + '/yum/yum.conf',
                 help=_("config file location"), metavar='[config file]')
         group.add_option("-R", "--randomwait", dest="sleeptime", type='int',
                 default=None,
@@ -1800,4 +1804,3 @@ def _filtercmdline(novalopts, valopts, args):
                     out.append(a)
 
     return out
-

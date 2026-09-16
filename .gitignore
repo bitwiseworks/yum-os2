@@ -7,3 +7,5 @@
 .project
 .pydevproject
 asthelper.completions
+/rpmUtils/paths.py
+/paths.vars

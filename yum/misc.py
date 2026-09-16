@@ -3,6 +3,8 @@
 Assorted utility functions for yum.
 """
 
+from rpmUtils import paths
+
 import types
 import os
 import os.path
@@ -110,9 +112,9 @@ def re_primary_filename(filename):
         positives). Note that this is a superset of re_primary_dirname(). """
     if re_primary_dirname(filename):
         return True
-    if filename.startswith('/@unixroot/etc/'):
+    if filename.startswith(paths.SYSCONFDIR + '/'):
         return True
-    if filename == '/@unixroot/lib/sendmail':
+    if filename == paths.ROOTPREFIX + 'lib/sendmail':
         return True
     return False
 
@@ -121,7 +123,7 @@ def re_primary_dirname(dirname):
         that this is a subset of re_primary_filename(). """
     if 'bin/' in dirname:
         return True
-    if dirname.startswith('/@unixroot/etc/'):
+    if dirname.startswith(paths.SYSCONFDIR + '/'):
         return True
     return False
 
@@ -605,7 +607,7 @@ def valid_detached_sig(sig_file, signed_file, gpghome=None):
 
     return False
 
-def getCacheDir(tmpdir='/var/tmp', reuse=True, prefix='yum-'):
+def getCacheDir(tmpdir=paths.LOCALSTATEDIR + '/tmp', reuse=True, prefix='yum-'):
     """return a path to a valid and safe cachedir - only used when not running
        as root or when --tempcache is set"""
     
@@ -790,7 +792,7 @@ def get_running_kernel_version_release(ts):
         return (pkgtup[3], pkgtup[4])
     return (None, None)
 
-def find_unfinished_transactions(yumlibpath='/var/lib/yum'):
+def find_unfinished_transactions(yumlibpath=paths.LOCALSTATEDIR + '/lib/yum'):
     """returns a list of the timestamps from the filenames of the unfinished 
        transactions remaining in the yumlibpath specified.
     """
@@ -810,7 +812,7 @@ def find_unfinished_transactions(yumlibpath='/var/lib/yum'):
     timestamps.sort()
     return timestamps
     
-def find_ts_remaining(timestamp, yumlibpath='/var/lib/yum'):
+def find_ts_remaining(timestamp, yumlibpath=paths.LOCALSTATEDIR + '/lib/yum'):
     """this function takes the timestamp of the transaction to look at and 
        the path to the yum lib dir (defaults to /var/lib/yum)
        returns a list of tuples(action, pkgspec) for the unfinished transaction

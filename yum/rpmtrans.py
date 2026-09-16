@@ -16,6 +16,8 @@
 # Parts Copyright 2007 Red Hat, Inc
 
 
+from rpmUtils import paths
+
 import rpm
 import os
 import fcntl
@@ -305,9 +307,7 @@ class RPMTransaction:
         # to handle us being inside a chroot at this point
         # we hand back the right path to those 'outside' of the chroot() calls
         # but we're using the right path inside.
-        if self.base.conf.installroot == '/':
-            return filename
-        if self.base.conf.installroot == '/@unixroot':
+        if self.base.conf.installroot == paths.ROOTPREFIX:
             return filename
 
         return filename.replace(os.path.normpath(self.base.conf.installroot),'')

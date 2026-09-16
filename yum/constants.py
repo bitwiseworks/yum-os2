@@ -16,9 +16,11 @@
 """
 Yum constants. Usually dealing with rpm magic numbers.
 """
+from rpmUtils import paths
+
 
 #Constants
-YUM_PID_FILE = '/var/run/yum.pid'
+YUM_PID_FILE = paths.LOCALSTATEDIR + '/run/yum.pid'
 
 #transaction set states
 TS_UPDATE = 10

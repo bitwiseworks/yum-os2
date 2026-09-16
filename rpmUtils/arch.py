@@ -1,6 +1,8 @@
 #!/usr/bin/python
 #
 
+from rpmUtils import paths
+
 import os
 
 # dict mapping arch -> ( multicompat, best personality, biarch personality )
@@ -294,9 +296,9 @@ def getCanonX86_64Arch(arch):
     return arch
         
 def getCanonArch(skipRpmPlatform = 0):
-    if not skipRpmPlatform and os.access("/@unixroot/etc/rpm/platform", os.R_OK):
+    if not skipRpmPlatform and os.access(paths.SYSCONFDIR + '/rpm/platform', os.R_OK):
         try:
-            f = open("/@unixroot/etc/rpm/platform", "r")
+            f = open(paths.SYSCONFDIR + '/rpm/platform', "r")
             line = f.readline()
             f.close()
             (arch, vendor, opersys) = line.split("-", 2)

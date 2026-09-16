@@ -18,6 +18,8 @@
 The Yum RPM software updater.
 """
 
+from rpmUtils import paths
+
 import os
 import os.path
 import rpm
@@ -107,11 +109,8 @@ class _YumPreBaseConf:
        you tweak it here, and when yb.conf does it's thing ... it happens. """
 
     def __init__(self):
-        self.fn = '/@unixroot/etc/yum/yum.conf'
-	if os.name == 'os2':
-	    self.root = '/@unixroot'
-	else:
-            self.root = '/'
+        self.fn = paths.SYSCONFDIR + '/yum/yum.conf'
+        self.root = paths.ROOTPREFIX
         self.init_plugins = True
         self.plugin_types = (plugins.TYPE_CORE,)
         self.optparser = None
@@ -234,7 +233,8 @@ class YumBase(depsolve.Depsolve):
         self.preconf.init_plugins = False
         self.conf.cache = cache
 
-    def doConfigSetup(self, fn='/etc/yum/yum.conf', root='/', init_plugins=True,
+    def doConfigSetup(self, fn=paths.SYSCONFDIR + '/yum/yum.conf',
+            root=paths.ROOTPREFIX, init_plugins=True,
             plugin_types=(plugins.TYPE_CORE,), optparser=None, debuglevel=None,
             errorlevel=None):
         warnings.warn(_('doConfigSetup() will go away in a future version of Yum.\n'),
@@ -296,9 +296,9 @@ class YumBase(depsolve.Depsolve):
 
         # TODO: Remove this block when we no longer support configs outside
         # of /etc/yum/
-        if fn == '/@unixroot/etc/yum/yum.conf' and not os.path.exists(fn):
+        if fn == paths.SYSCONFDIR + '/yum/yum.conf' and not os.path.exists(fn):
             # Try the old default
-            fn = '/@unixroot/etc/yum.conf'
+            fn = paths.SYSCONFDIR + '/yum.conf'
 
         startupconf = config.readStartupConfig(fn, root)
         startupconf.arch = arch
@@ -321,10 +321,10 @@ class YumBase(depsolve.Depsolve):
         if syslog_device != None:
             startupconf.syslog_device = syslog_device
         if releasever == '/':
-            if startupconf.installroot == '/':
+            if startupconf.installroot == paths.ROOTPREFIX:
                 releasever = None
             else:
-                releasever = yum.config._getsysver("/",startupconf.distroverpkg)
+                releasever = yum.config._getsysver(paths.ROOTPREFIX, startupconf.distroverpkg)
         if releasever != None:
             startupconf.releasever = releasever
 
@@ -464,8 +464,9 @@ class YumBase(depsolve.Depsolve):
             # this check makes sure that our dirs exist properly.
             # if they aren't in the installroot then don't prepend the installroot path
             # if we don't do this then anaconda likes to not  work.
-            if os.path.exists(self.conf.installroot+'/'+reposdir):
-                reposdir = self.conf.installroot + '/' + reposdir
+            rooted_reposdir = paths.rooted(self.conf.installroot, reposdir)
+            if os.path.exists(rooted_reposdir):
+                reposdir = rooted_reposdir
 
             if os.path.isdir(reposdir):
                 for repofn in sorted(glob.glob('%s/*.repo' % reposdir)):
@@ -1773,7 +1774,7 @@ class YumBase(depsolve.Depsolve):
             lockfile = os.path.basename(lockfile)
         else:
             root = self.conf.installroot
-        lockfile = root + '/' + lockfile # lock in the chroot
+        lockfile = paths.rooted(root, lockfile) # lock in the chroot
         lockfile = os.path.normpath(lockfile) # get rid of silly preceding extra /
         
         mypid=str(os.getpid())    
@@ -1827,7 +1828,7 @@ class YumBase(depsolve.Depsolve):
         
         if lockfile is not None:
             root = self.conf.installroot
-            lockfile = root + '/' + lockfile # lock in the chroot
+            lockfile = paths.rooted(root, lockfile) # lock in the chroot
         elif self._lockfile is None:
             return # Don't delete other people's lock files on __del__
         else:
@@ -5181,7 +5182,7 @@ class YumBase(depsolve.Depsolve):
         if tmpdir is None:
             tmpdir = os.getenv('TMPDIR')
         if tmpdir is None: # Note that TMPDIR isn't exported by default :(
-            tmpdir = '/var/tmp'
+            tmpdir = paths.LOCALSTATEDIR + '/tmp'
         try:
             cachedir = misc.getCacheDir(tmpdir, reuse)
         except (IOError, OSError), e:
@@ -5553,4 +5554,3 @@ class YumBase(depsolve.Depsolve):
         # Debugging output
         self.verbose_logger.log(logginglevels.DEBUG_2, _("%s has no user-installed revdeps."), pkg)
         return False
-

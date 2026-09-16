@@ -1,16 +1,10 @@
-SHELL=/@unixroot/usr/bin/sh
-PREFIX=/@unixroot/usr
-SYSCONFDIR=/@unixroot/etc
-LOCALSTATEDIR=/@unixroot/var
+include ../Config.mak
 
-INSTALL= /@unixroot/usr/bin/install -c
-INSTALL_PROGRAM= ${INSTALL}
-INSTALL_DATA= ${INSTALL} -m 644
-INSTALLNLSDIR=$(PREFIX)/share/locale
+INSTALLNLSDIR=$(DESTDIR)$(PREFIX)/share/locale
 top_srcdir = "."
 
 
-MSGMERGE = perl /@unixroot/usr/bin/intltool-update -x --gettext-package=$(NLSPACKAGE) --dist
+MSGMERGE = intltool-update -x --gettext-package=$(NLSPACKAGE) --dist
 
 NLSPACKAGE = yum
 
@@ -29,7 +23,7 @@ POTFILES.in:
 	done >> $@
 
 $(NLSPACKAGE).pot: $(POTFILES) POTFILES.in
-	perl /@unixroot/usr/bin/intltool-update --gettext-package=$(NLSPACKAGE) --pot
+	intltool-update --gettext-package=$(NLSPACKAGE) --pot
 
 update-po: Makefile $(NLSPACKAGE).pot refresh-po
 
@@ -51,26 +45,26 @@ report:
 	@for cat in *.po ; do \
 		echo -n "$$cat: "; \
 		msgfmt --statistics -o /dev/null $$cat; \
-	done    
+	done
 
 clean:
 	@rm -fv *mo *~ .depend *.autosave
-   
+
 distclean: clean
 	rm -f *mo .depend Makefile $(NLSPACKAGE).pot POTFILES.in
 
 depend:
 
 install:	all
-	mkdir.exe -p $(DESTDIR)/$(INSTALLNLSDIR)
+	$(MKDIR) -p $(INSTALLNLSDIR)
 	for n in $(CATALOGS); do \
 	    l=`basename $$n .po`; \
 	    mo=$$l.mo; \
 	    if [ ! -f $$mo ]; then continue; fi; \
-	    $(INSTALL) -m 755 -d $(DESTDIR)/$(INSTALLNLSDIR)/$$l; \
-	    $(INSTALL) -m 755 -d $(DESTDIR)/$(INSTALLNLSDIR)/$$l/LC_MESSAGES; \
+	    $(INSTALL) -m 755 -d $(INSTALLNLSDIR)/$$l; \
+	    $(INSTALL) -m 755 -d $(INSTALLNLSDIR)/$$l/LC_MESSAGES; \
 	    $(INSTALL) -m 644 $$mo \
-		$(DESTDIR)/$(INSTALLNLSDIR)/$$l/LC_MESSAGES/$(NLSPACKAGE).mo; \
+		$(INSTALLNLSDIR)/$$l/LC_MESSAGES/$(NLSPACKAGE).mo; \
 	done
 
 %.mo: %.po
@@ -81,5 +75,3 @@ test:
 	for n in $(CATALOGS); do \
 	msgfmt -c $$n; \
 	done
-
- 

@@ -1,7 +1,4 @@
-SHELL=/@unixroot/usr/bin/sh
-PREFIX=/@unixroot/usr
-SYSCONFDIR=/@unixroot/etc
-LOCALSTATEDIR=/@unixroot/var
+include Config.mak
 
 SUBDIRS = rpmUtils yum etc docs po
 PYFILES = $(wildcard *.py)
@@ -12,7 +9,6 @@ PKGNAME = yum
 VERSION=$(shell awk '/Version:/ { print $$2 }' ${PKGNAME}.spec)
 RELEASE=$(shell awk '/Release:/ { print $$2 }' ${PKGNAME}.spec)
 CVSTAG=yum-$(subst .,_,$(VERSION)-$(RELEASE))
-PYTHON=python2.7.exe
 WEBHOST = yum.baseurl.org
 WEB_DOC_PATH = /srv/projects/yum/web/download/docs/yum-api/
 
@@ -20,38 +16,43 @@ all: subdirs
 
 clean:
 	rm -f *.pyc *.pyo *~ *.bak
+	rm -f paths.vars
 	for d in $(SUBDIRS); do make -C $$d clean ; done
 	cd test; rm -f *.pyc *.pyo *~ *.bak
 
-subdirs:
-	for d in $(SUBDIRS); do make PYTHON=$(PYTHON) -C $$d; [ $$? = 0 ] || exit 1 ; done
+paths: $(PATHSPY)
 
-install:
-	mkdir -p $(DESTDIR)$(PREFIX)/share/yum-cli
+subdirs: paths
+	for d in $(SUBDIRS); do $(MAKE) -C $$d; [ $$? = 0 ] || exit 1 ; done
+
+install: paths
+	$(MKDIR) -p $(DESTDIR)$(PREFIX)/share/yum-cli
 	for p in $(PYFILES) ; do \
-		install -m 644 $$p $(DESTDIR)$(PREFIX)/share/yum-cli/$$p; \
+		$(INSTALL) -m 644 $$p $(DESTDIR)$(PREFIX)/share/yum-cli/$$p; \
 	done
 	mv $(DESTDIR)$(PREFIX)/share/yum-cli/yum-updatesd.py $(DESTDIR)$(PREFIX)/share/yum-cli/yumupd.py
 	$(PYTHON) -c "import compileall; compileall.compile_dir('$(DESTDIR)$(PREFIX)/share/yum-cli', 1, '$(PYDIR)', 1)"
 
-	mkdir -p $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(PREFIX)/sbin
-	install.exe -m 755 bin/yum.py $(DESTDIR)$(PREFIX)/bin/yum
-	install.exe -m 755 bin/yum-updatesd.py $(DESTDIR)$(PREFIX)/sbin/yum-updatesd
+	$(MKDIR) -p $(DESTDIR)$(PREFIX)/bin $(DESTDIR)$(PREFIX)/sbin
+	$(INSTALL) -m 755 bin/yum.py $(DESTDIR)$(PREFIX)/bin/yum
+	$(INSTALL) -m 755 bin/yum-updatesd.py $(DESTDIR)$(PREFIX)/sbin/yum-updatesd
 
-	mkdir -p $(DESTDIR)$(LOCALSTATEDIR)/cache/yum
-	mkdir -p $(DESTDIR)$(LOCALSTATEDIR)/lib/yum	
+	$(MKDIR) -p $(DESTDIR)$(LOCALSTATEDIR)/cache/yum
+	$(MKDIR) -p $(DESTDIR)$(LOCALSTATEDIR)/lib/yum
 
-	for d in $(SUBDIRS); do make PYTHON=$(PYTHON) DESTDIR=`cd $(DESTDIR); pwd` -C $$d install; [ $$? = 0 ] || exit 1; done
+	for d in $(SUBDIRS); do $(MAKE) DESTDIR=`cd $(DESTDIR); pwd` -C $$d install; [ $$? = 0 ] || exit 1; done
 
-.PHONY: docs test install
+.PHONY: docs test install paths subdirs
+
+docs doccheck test test-skipbroken testnewbehavior pylint pylint-short: paths
 
 DOCS = yum rpmUtils callback.py yumcommands.py shell.py output.py cli.py utils.py\
-	   yummain.py 
+	   yummain.py
 
 # packages needed for docs : yum install epydoc graphviz
 docs:
 	@rm -rf docs/epydoc/$(VERSION)
-	@mkdir -p docs/epydoc/$(VERSION)
+	@$(MKDIR) -p docs/epydoc/$(VERSION)
 	@epydoc -o docs/epydoc/$(VERSION) -u http://yum.baseurl.org --name "Yum" --graph all $(DOCS)
 
 upload-docs: docs
@@ -105,6 +106,5 @@ _archive:
 	@rm -rf /tmp/${PKGNAME}/.git
 	@mv /tmp/${PKGNAME} /tmp/${PKGNAME}-$(VERSION)
 	@dir=$$PWD; cd /tmp; tar cvzf $$dir/${PKGNAME}-$(VERSION).tar.gz ${PKGNAME}-$(VERSION)
-	@rm -rf /tmp/${PKGNAME}-$(VERSION)	
+	@rm -rf /tmp/${PKGNAME}-$(VERSION)
 	@echo "The archive is in ${PKGNAME}-$(VERSION).tar.gz"
-

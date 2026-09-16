@@ -20,6 +20,8 @@ Configuration parser and default values for yum.
 """
 _use_iniparse = True
 
+from rpmUtils import paths
+
 import os
 import sys
 import warnings
@@ -613,19 +615,16 @@ class StartupConf(BaseConfig):
     errorlevel = IntOption(2, 0, 10)
 
     distroverpkg = Option('redhat-release')
-    if os.name == 'os2':
-        installroot = Option('/@unixroot')
-    else:
-        installroot = Option('/')
-    config_file_path = Option('/@unixroot/etc/yum/yum.conf')
+    installroot = Option(paths.ROOTPREFIX)
+    config_file_path = Option(paths.SYSCONFDIR + '/yum/yum.conf')
     plugins = BoolOption(False)
-    pluginpath = ListOption(['/@unixroot/usr/share/yum-plugins', '/@unixroot/usr/lib/yum-plugins'])
-    pluginconfpath = ListOption(['/@unixroot/etc/yum/pluginconf.d'])
+    pluginpath = ListOption([paths.PREFIX + '/share/yum-plugins', paths.PREFIX + '/lib/yum-plugins'])
+    pluginconfpath = ListOption([paths.SYSCONFDIR + '/yum/pluginconf.d'])
     gaftonmode = BoolOption(False)
     syslog_ident = Option()
     syslog_facility = Option('LOG_USER')
     syslog_device = Option('/dev/log')
-    persistdir = Option('/var/lib/yum')
+    persistdir = Option(paths.LOCALSTATEDIR + '/lib/yum')
     
 class YumConf(StartupConf):
     '''
@@ -636,11 +635,11 @@ class YumConf(StartupConf):
     retries = PositiveIntOption(10, names_of_0=["<forever>"])
     recent = IntOption(7, range_min=0)
 
-    cachedir = Option('/var/cache/yum')
+    cachedir = Option(paths.LOCALSTATEDIR + '/cache/yum')
 
     keepcache = BoolOption(True)
-    logfile = Option('/var/log/yum.log')
-    reposdir = ListOption(['/@unixroot/etc/yum/repos.d', '/@unixroot/etc/yum.repos.d'])
+    logfile = Option(paths.LOCALSTATEDIR + '/log/yum.log')
+    reposdir = ListOption([paths.SYSCONFDIR + '/yum/repos.d', paths.SYSCONFDIR + '/yum.repos.d'])
 
     commands = ListOption()
     exclude = ListOption()
@@ -740,7 +739,7 @@ class YumConf(StartupConf):
 
     rpmverbosity = Option('info')
 
-    protected_packages = ListOption("yum, glob:/etc/yum/protected.d/*.conf",
+    protected_packages = ListOption('yum, glob:' + paths.SYSCONFDIR + '/yum/protected.d/*.conf',
                                     parse_default=True)
     protected_multilib = BoolOption(True)
     exit_on_lock = BoolOption(False)
@@ -881,7 +880,7 @@ def readStartupConfig(configfile, root):
     startupconf._parser = parser
     # setup the release ver here
     startupconf.releasever = _getsysver(startupconf.installroot, startupconf.distroverpkg)
-    uuidfile = '%s/%s/uuid' % (startupconf.installroot, startupconf.persistdir)
+    uuidfile = paths.rooted(startupconf.installroot, startupconf.persistdir + '/uuid')
     startupconf.uuid = get_uuid(uuidfile)
 
     return startupconf
@@ -912,15 +911,12 @@ def readMainConfig(startupconf):
     # Apply the installroot to directory options
     def _apply_installroot(yumconf, option):
         path = getattr(yumconf, option)
-        ir_path = yumconf.installroot + path
-        ir_path = ir_path.replace('//', '/') # os.path.normpath won't fix this and
-                                             # it annoys me
-        ir_path = varReplace(ir_path, yumvars)
+        ir_path = paths.rooted(yumconf.installroot, varReplace(path, yumvars))
         setattr(yumconf, option, ir_path)
     
     # Read the FS yumvars
     try:
-        dir_fsvars = yumconf.installroot + "/etc/yum/vars/"
+        dir_fsvars = paths.rooted(yumconf.installroot, paths.SYSCONFDIR + '/yum/vars') + '/'
         fsvars = os.listdir(dir_fsvars)
     except OSError:
         fsvars = []
@@ -958,7 +954,7 @@ def readMainConfig(startupconf):
     
     return yumconf
 
-def readVersionGroupsConfig(configfile="/@unixroot/etc/yum/version-groups.conf"):
+def readVersionGroupsConfig(configfile=paths.SYSCONFDIR + '/yum/version-groups.conf'):
     parser = ConfigParser()
     confpp_obj = ConfigPreProcessor(configfile)
     try:

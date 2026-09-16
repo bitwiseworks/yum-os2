@@ -28,6 +28,8 @@
 # $ dbus-send --system --print-reply --type=method_call \
 #   --dest=edu.duke.linux.yum /Updatesd edu.duke.linux.yum.CheckNow
 
+from rpmUtils import paths
+
 import os
 import sys
 import time
@@ -53,10 +55,10 @@ from yum.constants import *
 from yum.update_md import UpdateMetadata
 
 # FIXME: is it really sane to use this from here?
-sys.path.append('/@unixroot/usr/share/yum-cli')
+sys.path.append(paths.PREFIX + '/share/yum-cli')
 import callback
 
-config_file = '/@unixroot/etc/yum/yum-updatesd.conf'
+config_file = paths.SYSCONFDIR + '/yum/yum-updatesd.conf'
 initial_directory = os.getcwd()
 
 class UpdateEmitter(object):
@@ -233,7 +235,7 @@ class YumDbusInterface(dbus.service.Object):
 class UDConfig(BaseConfig):
     """Config format for the daemon"""
     run_interval = IntOption(3600)
-    nonroot_workdir = Option("/var/tmp/yum-updatesd")
+    nonroot_workdir = Option(paths.LOCALSTATEDIR + '/tmp/yum-updatesd')
     emit_via = ListOption(['dbus', 'email', 'syslog'])
     email_to = ListOption(["root"])
     email_from = Option("root")
@@ -245,7 +247,7 @@ class UDConfig(BaseConfig):
     syslog_facility = Option("DAEMON")
     syslog_level = Option("WARN")
     syslog_ident = Option("yum-updatesd")
-    yum_config = Option("/etc/yum/yum.conf")
+    yum_config = Option(paths.SYSCONFDIR + '/yum/yum.conf')
 
 
 class UpdateBuildTransactionThread(threading.Thread):

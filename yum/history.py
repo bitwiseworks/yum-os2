@@ -17,6 +17,8 @@
 #
 # James Antill <james@fedoraproject.org>
 
+from rpmUtils import paths
+
 import time
 import os, os.path
 import glob
@@ -31,7 +33,7 @@ from yum.i18n import to_unicode, to_utf8
 
 from rpmUtils.arch import getBaseArch
 
-_history_dir = '/var/lib/yum/history'
+_history_dir = paths.LOCALSTATEDIR + '/lib/yum/history'
 
 # NOTE: That we don't list TS_FAILED, because pkgs shouldn't go into the
 #       transaction with that. And if they come out with that we don't want to
@@ -557,17 +559,11 @@ class YumMergedHistoryTransaction(YumHistoryTransaction):
 class YumHistory:
     """ API for accessing the history sqlite data. """
 
-    def __init__(self, root='/', db_path=_history_dir):
+    def __init__(self, root=paths.ROOTPREFIX, db_path=_history_dir):
         self._conn = None
         
         self.conf = yum.misc.GenericHolder()
-        # YD dbpath is already root based
-        self.conf.db_path  = os.path.normpath(db_path)
-
-        #if not os.path.normpath(db_path).startswith(root):
-        #    self.conf.db_path  = os.path.normpath(root + '/' + db_path)
-        #else:
-        #    self.conf.db_path = os.path.normpath('/' + db_path)
+        self.conf.db_path  = paths.rooted(root, db_path)
         self.conf.writable = False
         self.conf.readable = True
 

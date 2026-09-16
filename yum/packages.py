@@ -19,6 +19,8 @@
 Classes and functions dealing with rpm package representations.
 """
 
+from rpmUtils import paths
+
 import rpm
 import os
 import os.path
@@ -1771,7 +1773,7 @@ class YumInstalledPackage(YumHeaderPackage):
         results = {} # fn = problem_obj?
 
         # Use prelink_undo_cmd macro?
-        prelink_cmd = "/usr/sbin/prelink"
+        prelink_cmd = paths.PREFIX + '/sbin/prelink'
         have_prelink = os.path.exists(prelink_cmd)
 
         # determine what checksum algo to use:

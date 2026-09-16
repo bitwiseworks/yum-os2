@@ -13,6 +13,8 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+from rpmUtils import paths
+
 import rpm
 import types
 import warnings
@@ -200,8 +202,8 @@ class RPMDBPackageSack(PackageSackBase):
     # Do we want to cache rpmdb data in a file, for later use?
     __cache_rpmdb__ = True
 
-    def __init__(self, root='/', releasever=None, cachedir=None,
-                 persistdir='/var/lib/yum'):
+    def __init__(self, root=paths.ROOTPREFIX, releasever=None, cachedir=None,
+                 persistdir=paths.LOCALSTATEDIR + '/lib/yum'):
         self.root = root
         self._idx2pkg = {}
         self._name2pkg = {}
@@ -335,7 +337,7 @@ class RPMDBPackageSack(PackageSackBase):
 
         #  We are keeping some data from before, and sometimes (Eg. remove only)
         # we never open the rpmdb again ... so get the mtime now.
-        rpmdbfname  = self.root + "/var/lib/rpm/Packages"
+        rpmdbfname  = paths.rooted(self.root, paths.LOCALSTATEDIR + '/lib/rpm/Packages')
         self._cached_rpmdb_mtime = os.path.getmtime(rpmdbfname)
 
         def _safe_del(x, y):
@@ -1063,7 +1065,7 @@ class RPMDBPackageSack(PackageSackBase):
         # http://lists.rpm.org/pipermail/rpm-maint/2007-November/001719.html
         # ...if anything gets implemented, we should change.
         rpmdbvfname = self._cachedir + "/version"
-        rpmdbfname  = self.root + "/var/lib/rpm/Packages"
+        rpmdbfname  = paths.rooted(self.root, paths.LOCALSTATEDIR + '/lib/rpm/Packages')
 
         if os.path.exists(rpmdbvfname) and os.path.exists(rpmdbfname):
             # See if rpmdb has "changed" ...
@@ -1086,7 +1088,7 @@ class RPMDBPackageSack(PackageSackBase):
         if self._cached_rpmdb_mtime is None:
             return # We haven't loaded any packages!!!
 
-        rpmdbfname  = self.root + "/var/lib/rpm/Packages"
+        rpmdbfname  = paths.rooted(self.root, paths.LOCALSTATEDIR + '/lib/rpm/Packages')
         if not os.path.exists(rpmdbfname):
             return # haha
 
@@ -1282,7 +1284,7 @@ class RPMDBPackageSack(PackageSackBase):
         self._name2pkg.setdefault(po.name, []).append(po)
         self._tup2pkg[po.pkgtup] = po
         if self.__cache_rpmdb__ and self._cached_rpmdb_mtime is None:
-            rpmdbfname  = self.root + "/var/lib/rpm/Packages"
+            rpmdbfname  = paths.rooted(self.root, paths.LOCALSTATEDIR + '/lib/rpm/Packages')
             self._cached_rpmdb_mtime = os.path.getmtime(rpmdbfname)
 
         return po
@@ -1567,7 +1569,7 @@ class RPMDBAdditionalData(object):
     # dirs have files per piece of info we're keeping
     #    repoid, install reason, status, blah, (group installed for?), notes?
     
-    def __init__(self, db_path='/var/lib/yum/yumdb', version_path=None):
+    def __init__(self, db_path=paths.LOCALSTATEDIR + '/lib/yum/yumdb', version_path=None):
         self.conf = misc.GenericHolder()
         self.conf.db_path = db_path
         self.conf.version_path = version_path
@@ -1859,7 +1861,7 @@ class RPMDBAdditionalDataPackage(object):
         
         
 def main():
-    sack = RPMDBPackageSack('/')
+    sack = RPMDBPackageSack()
     for p in sack.simplePkgList():
         print p
 
