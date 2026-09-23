@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-15 01:55-0700\n"
+"POT-Creation-Date: 2026-09-23 16:38-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -463,116 +463,116 @@ msgid "--color takes one of: auto, always, never"
 msgstr ""
 
 #. We have a relative installroot ... haha
-#: ../cli.py:1640
+#: ../cli.py:1646
 #, python-format
 msgid "--installroot must be an absolute path: %s"
 msgstr ""
 
-#: ../cli.py:1688
+#: ../cli.py:1694
 msgid "show this help message and exit"
 msgstr ""
 
-#: ../cli.py:1692
+#: ../cli.py:1698
 msgid "be tolerant of errors"
 msgstr ""
 
-#: ../cli.py:1695
+#: ../cli.py:1701
 msgid "run entirely from system cache, don't update cache"
 msgstr ""
 
-#: ../cli.py:1698
+#: ../cli.py:1704
 msgid "config file location"
 msgstr ""
 
-#: ../cli.py:1701
+#: ../cli.py:1707
 msgid "maximum command wait time"
 msgstr ""
 
-#: ../cli.py:1703
+#: ../cli.py:1709
 msgid "debugging output level"
 msgstr ""
 
-#: ../cli.py:1707
+#: ../cli.py:1713
 msgid "show duplicates, in repos, in list/search commands"
 msgstr ""
 
-#: ../cli.py:1709
+#: ../cli.py:1715
 msgid "error output level"
 msgstr ""
 
-#: ../cli.py:1712
+#: ../cli.py:1718
 msgid "debugging output level for rpm"
 msgstr ""
 
-#: ../cli.py:1715
+#: ../cli.py:1721
 msgid "quiet operation"
 msgstr ""
 
-#: ../cli.py:1717
+#: ../cli.py:1723
 msgid "verbose operation"
 msgstr ""
 
-#: ../cli.py:1719
+#: ../cli.py:1725
 msgid "answer yes for all questions"
 msgstr ""
 
-#: ../cli.py:1721
+#: ../cli.py:1727
 msgid "show Yum version and exit"
 msgstr ""
 
-#: ../cli.py:1722
+#: ../cli.py:1728
 msgid "set install root"
 msgstr ""
 
-#: ../cli.py:1726
+#: ../cli.py:1732
 msgid "enable one or more repositories (wildcards allowed)"
 msgstr ""
 
-#: ../cli.py:1730
+#: ../cli.py:1736
 msgid "disable one or more repositories (wildcards allowed)"
 msgstr ""
 
-#: ../cli.py:1733
+#: ../cli.py:1739
 msgid "exclude package(s) by name or glob"
 msgstr ""
 
-#: ../cli.py:1735
+#: ../cli.py:1741
 msgid "disable exclude from main, for a repo or for everything"
 msgstr ""
 
-#: ../cli.py:1738
+#: ../cli.py:1744
 msgid "enable obsoletes processing during updates"
 msgstr ""
 
-#: ../cli.py:1740
+#: ../cli.py:1746
 msgid "disable Yum plugins"
 msgstr ""
 
-#: ../cli.py:1742
+#: ../cli.py:1748
 msgid "disable gpg signature checking"
 msgstr ""
 
-#: ../cli.py:1744
+#: ../cli.py:1750
 msgid "disable plugins by name"
 msgstr ""
 
-#: ../cli.py:1747
+#: ../cli.py:1753
 msgid "enable plugins by name"
 msgstr ""
 
-#: ../cli.py:1750
+#: ../cli.py:1756
 msgid "skip packages with depsolving problems"
 msgstr ""
 
-#: ../cli.py:1752
+#: ../cli.py:1758
 msgid "control whether color is used"
 msgstr ""
 
-#: ../cli.py:1754
+#: ../cli.py:1760
 msgid "set value of $releasever in yum config and repo files"
 msgstr ""
 
-#: ../cli.py:1756
+#: ../cli.py:1762
 msgid "set arbitrary config and repo options"
 msgstr ""
 

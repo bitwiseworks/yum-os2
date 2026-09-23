@@ -1634,7 +1634,13 @@ class YumOptionParser(OptionParser):
     def _checkAbsInstallRoot(self, opts):
         if not opts.installroot:
             return
-        if opts.installroot[0] == '/':
+        if opts.installroot.rstrip('/') == paths.ROOTPREFIX.rstrip('/'):
+            return
+        if opts.installroot.startswith(paths.ROOTPREFIX) or \
+            (os.name == 'os2' and \
+                len(opts.installroot) >= 3 and opts.installroot[0].isalpha() and \
+                opts.installroot[1] == ':' and  \
+                    (opts.installroot[2] == '/' or opts.installroot[2] == '\\')):
             return
         # We have a relative installroot ... haha
         self.logger.critical(_('--installroot must be an absolute path: %s'),

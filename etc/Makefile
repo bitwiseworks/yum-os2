@@ -14,7 +14,11 @@ install:
 	$(MKDIR) -p $(DESTDIR)$(SYSCONFDIR)/yum/repos.d
 	$(MKDIR) -p $(DESTDIR)$(SYSCONFDIR)/yum/vars
 
-	$(INSTALL) -m 644 yum.conf $(YUMETC)/yum.conf
+	sed -e 's|\([^[:alnum:]/]\)/usr|\1$(PREFIX)|g' \
+	    -e 's|\([^[:alnum:]/]\)/etc|\1$(SYSCONFDIR)|g' \
+	    -e 's|\([^[:alnum:]/]\)/var|\1$(LOCALSTATEDIR)|g' \
+	    yum.conf > $(YUMETC)/yum.conf
+	chmod 644 $(YUMETC)/yum.conf
 
 	$(INSTALL) -m 644 version-groups.conf $(YUMETC)/version-groups.conf
 
