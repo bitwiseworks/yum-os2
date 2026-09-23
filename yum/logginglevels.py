@@ -199,7 +199,7 @@ def setFileLog(uid, logfile, cleanup=None):
             
             if not os.path.exists(logfile):
                 f = open(logfile, 'w')
-                os.chmod(logfile, 0600) # making sure umask doesn't catch us up
+                os.fchmod(f.fileno(), 0600) # making sure umask doesn't catch us up
                 f.close()
                 
             filelogger = logging.getLogger("yum.filelogging")
